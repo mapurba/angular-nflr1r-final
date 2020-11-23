@@ -15,6 +15,7 @@ export class TodoItemNode {
   item: string;
   color: string;
   propName: string;
+  path: string;
 }
 
 enum Colors {
@@ -31,6 +32,7 @@ export class TodoItemFlatNode {
   color: string;
   expandable: boolean;
   propName: string;
+  path: string;
 }
 
 /**
@@ -119,17 +121,21 @@ export class ChecklistDatabase {
    * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
    * The return value is the list of `TodoItemNode`.
    */
-  buildFileTree(obj: { [key: string]: any }, level: number): TodoItemNode[] {
+  buildFileTree(
+    obj: { [key: string]: any },
+    level: number,
+    path: string = "/"
+  ): TodoItemNode[] {
     return Object.keys(obj).reduce<TodoItemNode[]>((accumulator, key) => {
       const value = obj[key];
       const node = new TodoItemNode();
       node.item = key;
-      // node.propName = key;
-      node.color = Colors.RED;
+      node.path = path + key;
+      node.color = Colors.BLACK;
 
       if (value != null) {
         if (typeof value === "object") {
-          node.children = this.buildFileTree(value, level + 1);
+          (node.children = this.buildFileTree(value, level + 1)), path + "/";
         } else {
           node.item = value;
           node.propName = key;
